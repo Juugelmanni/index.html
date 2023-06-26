@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ToTheMoon - 100 suurinta kryptovaluuttaa</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    .crypto-logo {
+      max-width: 50px;
+      max-height: 50px;
+    }
+  </style>
+</head>
+<body>
+  <h1>ToTheMoon - 100 suurinta kryptovaluuttaa</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Sija</th>
+        <th>Nimi</th>
+        <th>Logo</th>
+        <th>Yksittäisen kolikon arvo (USD)</th>
+        <th>Markkina-arvo (USD)</th>
+        <th>24 tunnin muutos markkina-arvossa (%)</th>
+      </tr>
+    </thead>
+    <tbody id="crypto-list">
+    </tbody>
+  </table>
+  
+  <script>
+    $(document).ready(function() {
+      // Hae 100 suurimman kryptovaluutan tiedot CoinGeckosta
+      $.ajax({
+        url: "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false",
+        method: "GET",
+        success: function(response) {
+          // Luo taulukkoon rivi jokaiselle kryptovaluutalle
+          $.each(response, function(index, crypto) {
+            const rank = index + 1;
+            const name = crypto.name;
+            const coinPrice = crypto.current_price ? "$" + crypto.current_price.toFixed(2) : "N/A";
+            const marketCap = crypto.market_cap ? crypto.market_cap.toLocaleString() : "N/A";
+            const marketCapChange24h = crypto.price_change_percentage_24h ? crypto.price_change_percentage_24h.toFixed(2) + "%" : "N/A";
+            const imageUrl = crypto.image;
+            
+            // Luo kuvaelementti
+            const imageElement = "<img class='crypto-logo' src='" + imageUrl + "' alt='" + name + " logo'>";
+            
+            // Luo taulukon rivi
+            const row = "<tr><td>" + rank + "</td><td>" + name + "</td><td>" + imageElement + "</td><td>" + coinPrice + "</td><td>$" + marketCap + "</td><td>" + marketCapChange24h + "</td></tr>";
+            $("#crypto-list").append(row);
+          });
+        },
+        error: function() {
+          alert("Virhe ladattaessa kryptovaluuttojen tietoja");
+        }
+      });
+    });
+  </script>
+</body>
+</html>
